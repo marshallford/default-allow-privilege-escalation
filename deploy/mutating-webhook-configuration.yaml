@@ -1,0 +1,31 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: default-allow-privilege-escalation
+  labels:
+    app.kubernetes.io/name: default-allow-privilege-escalation-webhook
+webhooks:
+- name: default-allow-privilege-escalation.webhook.marshallford.me
+  failurePolicy: Ignore
+  reinvocationPolicy: IfNeeded
+  matchPolicy: Equivalent
+  sideEffects: None
+  timeoutSeconds: 5
+  admissionReviewVersions: ["v1"]
+  clientConfig:
+    service:
+      name: webhook
+      namespace: default-allow-privilege-escalation
+      path: "/api/v1/mutate"
+    caBundle: ""
+  rules:
+  - operations: ["CREATE", "UPDATE"]
+    apiGroups: [""]
+    apiVersions: ["v1"]
+    resources: ["pods"]
+    scope: Namespaced
+  namespaceSelector:
+    matchExpressions:
+    - key: runlevel
+      operator: NotIn
+      values: ["0", "1"]
