@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// New creates a webhook config
 func New() *viper.Viper {
 	c := map[string]interface{}{
 		"configPath": ".",

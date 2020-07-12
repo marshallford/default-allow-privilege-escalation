@@ -6,7 +6,7 @@ GIT_BRANCH ?= `git rev-parse --abbrev-ref HEAD`
 GIT_COMMIT ?= `git rev-parse --short HEAD`
 
 lint:
-	docker run --rm -v $(pwd):/app -w /app golangci/golangci-lint:v1.28 golangci-lint run -v
+	docker run --rm -v $(PWD):/app -w /app golangci/golangci-lint:v1.28 golangci-lint run -v
 
 test:
 	go test ./... -race

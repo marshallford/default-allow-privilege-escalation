@@ -23,5 +23,8 @@ func main() {
 		}
 		tlsConfigs = append(tlsConfigs, &tls.Config{Certificates: []tls.Certificate{cer}})
 	}
-	app.Listen(config.GetInt("server.port"), tlsConfigs...)
+	err := app.Listen(config.GetInt("server.port"), tlsConfigs...)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// New creates a webhook fiber app
 func New(config *viper.Viper) *fiber.App {
 	app := fiber.New(&fiber.Settings{
 		StrictRouting: true,
@@ -26,10 +27,13 @@ func New(config *viper.Viper) *fiber.App {
 
 	// API 404 handler
 	api.Use(func(c *fiber.Ctx) {
-		c.Status(fiber.StatusNotFound).JSON(map[string]interface{}{
+		err := c.Status(fiber.StatusNotFound).JSON(map[string]interface{}{
 			"code":   fiber.StatusNotFound,
 			"status": fiber.ErrNotFound.Message,
 		})
+		if err != nil {
+			c.Next(err)
+		}
 	})
 
 	// App 404 handler

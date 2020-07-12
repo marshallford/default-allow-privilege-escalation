@@ -36,12 +36,16 @@ func init() {
 	utilruntime.Must(admissionv1.AddToScheme(scheme))
 }
 
+// Handler is the HTTP handler for mutate requests
 func Handler(config *viper.Viper, c *fiber.Ctx) {
 	// validate Content-Type
 	if !c.Is("json") {
-		c.Status(fiber.StatusUnsupportedMediaType).JSON(&appError{
+		err := c.Status(fiber.StatusUnsupportedMediaType).JSON(&appError{
 			Error: "invalid content-type, expected application/json",
 		})
+		if err != nil {
+			c.Next(err)
+		}
 		return
 	}
 
@@ -49,25 +53,34 @@ func Handler(config *viper.Viper, c *fiber.Ctx) {
 	reviewGVK := admissionv1.SchemeGroupVersion.WithKind("AdmissionReview")
 	obj, gvk, err := deserializer.Decode([]byte(c.Body()), &reviewGVK, &admissionv1.AdmissionReview{})
 	if err != nil {
-		c.Status(fiber.StatusBadRequest).JSON(&appError{
+		err := c.Status(fiber.StatusBadRequest).JSON(&appError{
 			Error: "could not decode AdmissionReview",
 		})
+		if err != nil {
+			c.Next(err)
+		}
 		return
 	}
 
 	review, ok := obj.(*admissionv1.AdmissionReview)
 	if !ok {
-		c.Status(fiber.StatusBadRequest).JSON(&appError{
+		err := c.Status(fiber.StatusBadRequest).JSON(&appError{
 			Error: fmt.Sprintf("unexpected GroupVersionKind: %s", gvk),
 		})
+		if err != nil {
+			c.Next(err)
+		}
 		return
 	}
 
 	// check if request is empty
 	if review.Request == nil {
-		c.Status(fiber.StatusBadRequest).JSON(&appError{
+		err := c.Status(fiber.StatusBadRequest).JSON(&appError{
 			Error: "unexpected nil AdmissionRequest",
 		})
+		if err != nil {
+			c.Next(err)
+		}
 		return
 	}
 
@@ -77,7 +90,10 @@ func Handler(config *viper.Viper, c *fiber.Ctx) {
 	// return new AdmissionReview
 	review.Response = admissionResponse
 	review.Response.UID = review.Request.UID
-	c.JSON(review)
+	err = c.Status(fiber.StatusOK).JSON(review)
+	if err != nil {
+		c.Next(err)
+	}
 }
 
 func mutationRequired(metadata *metav1.ObjectMeta) bool {
