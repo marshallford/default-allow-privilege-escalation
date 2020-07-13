@@ -1,4 +1,4 @@
-# Kubernetes Mutating Webhook for defaulting AllowPrivilegeEscalation
+# Kubernetes Mutating Webhook for Defaulting AllowPrivilegeEscalation
 
 [![Build Status](https://github.com/marshallford/default-allow-privilege-escalation/workflows/CI/badge.svg)](https://github.com/marshallford/default-allow-privilege-escalation/actions?query=workflow%3ACI)
 [![Go Report](https://goreportcard.com/badge/github.com/marshallford/default-allow-privilege-escalation)](https://goreportcard.com/report/github.com/marshallford/default-allow-privilege-escalation)
@@ -11,7 +11,7 @@ Controls the nil behavior of the field `allowPrivilegeEscalation` in the [`Secur
 - [ ] find a better way to test Fiber handlers
 - [ ] tests for config and health packages
 - [ ] webhook should self-manage CA bundle
-- [X] Github Actions with test and coverage badges
+- [x] Github Actions with test and coverage badges
 - [ ] improve makefile
 - [ ] release CI with tagging
 - [ ] publish container image
@@ -19,23 +19,33 @@ Controls the nil behavior of the field `allowPrivilegeEscalation` in the [`Secur
 - [ ] provide install instructions
 - [ ] docs showing behavior
 
-## Contribute
+## 🏁 Quickstart
+
+TODO
+
+## ⚙️ Configure
+
+TODO
+
+## 🤖 Hack
 
 ### Test
 
 ```shell
 make test
+make coverage
 ```
 
 ### Build
 
 ```shell
 make build
-make docker-build # container image
+make docker-build # builds container image
 ```
 
 ### Run
 
 ```shell
 make run
+make docker-run # runs container image
 ```

@@ -1,6 +1,6 @@
 default: test
 
-VERSION := 0.01.0-dev
+VERSION := 0.01.0
 
 GITHUB_REPOSITORY ?= marshallford/default-allow-privilege-escalation
 IMAGE := $(GITHUB_REPOSITORY)
