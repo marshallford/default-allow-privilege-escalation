@@ -36,63 +36,65 @@ func init() {
 	utilruntime.Must(admissionv1.AddToScheme(scheme))
 }
 
-// Handler is the HTTP handler for mutate requests
-func Handler(config *viper.Viper, c *fiber.Ctx) {
-	// validate Content-Type
-	if !c.Is("json") {
-		err := c.Status(fiber.StatusUnsupportedMediaType).JSON(&appError{
-			Error: "invalid content-type, expected application/json",
-		})
+// HandlerFunc returns a func that is a HTTP handler for mutate requests
+func HandlerFunc(config *viper.Viper) fiber.Handler {
+	return func(c *fiber.Ctx) {
+		// validate Content-Type
+		if !c.Is("json") {
+			err := c.Status(fiber.StatusUnsupportedMediaType).JSON(&appError{
+				Error: "invalid content-type, expected application/json",
+			})
+			if err != nil {
+				c.Next(err)
+			}
+			return
+		}
+
+		// get AdmissionReview
+		reviewGVK := admissionv1.SchemeGroupVersion.WithKind("AdmissionReview")
+		obj, gvk, err := deserializer.Decode([]byte(c.Body()), &reviewGVK, &admissionv1.AdmissionReview{})
+		if err != nil {
+			err := c.Status(fiber.StatusBadRequest).JSON(&appError{
+				Error: "could not decode AdmissionReview",
+			})
+			if err != nil {
+				c.Next(err)
+			}
+			return
+		}
+
+		review, ok := obj.(*admissionv1.AdmissionReview)
+		if !ok {
+			err := c.Status(fiber.StatusBadRequest).JSON(&appError{
+				Error: fmt.Sprintf("unexpected GroupVersionKind: %s", gvk),
+			})
+			if err != nil {
+				c.Next(err)
+			}
+			return
+		}
+
+		// check if request is empty
+		if review.Request == nil {
+			err := c.Status(fiber.StatusBadRequest).JSON(&appError{
+				Error: "unexpected nil AdmissionRequest",
+			})
+			if err != nil {
+				c.Next(err)
+			}
+			return
+		}
+
+		// mutate
+		admissionResponse := mutate(review, config.GetBool("app.default"))
+
+		// return new AdmissionReview
+		review.Response = admissionResponse
+		review.Response.UID = review.Request.UID
+		err = c.Status(fiber.StatusOK).JSON(review)
 		if err != nil {
 			c.Next(err)
 		}
-		return
-	}
-
-	// get AdmissionReview
-	reviewGVK := admissionv1.SchemeGroupVersion.WithKind("AdmissionReview")
-	obj, gvk, err := deserializer.Decode([]byte(c.Body()), &reviewGVK, &admissionv1.AdmissionReview{})
-	if err != nil {
-		err := c.Status(fiber.StatusBadRequest).JSON(&appError{
-			Error: "could not decode AdmissionReview",
-		})
-		if err != nil {
-			c.Next(err)
-		}
-		return
-	}
-
-	review, ok := obj.(*admissionv1.AdmissionReview)
-	if !ok {
-		err := c.Status(fiber.StatusBadRequest).JSON(&appError{
-			Error: fmt.Sprintf("unexpected GroupVersionKind: %s", gvk),
-		})
-		if err != nil {
-			c.Next(err)
-		}
-		return
-	}
-
-	// check if request is empty
-	if review.Request == nil {
-		err := c.Status(fiber.StatusBadRequest).JSON(&appError{
-			Error: "unexpected nil AdmissionRequest",
-		})
-		if err != nil {
-			c.Next(err)
-		}
-		return
-	}
-
-	// mutate
-	admissionResponse := mutate(review, config.GetBool("app.default"))
-
-	// return new AdmissionReview
-	review.Response = admissionResponse
-	review.Response.UID = review.Request.UID
-	err = c.Status(fiber.StatusOK).JSON(review)
-	if err != nil {
-		c.Next(err)
 	}
 }
 

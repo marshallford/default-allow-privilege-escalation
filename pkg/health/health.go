@@ -10,10 +10,12 @@ type Health struct {
 	Ready bool `json:"ready"`
 }
 
-// Handler is the HTTP handler for health requests
-func Handler(config *viper.Viper, c *fiber.Ctx) {
-	err := c.JSON(Health{Ready: true})
-	if err != nil {
-		c.Next(err)
+// HandlerFunc returns a func that is a HTTP handler for health requests
+func HandlerFunc(config *viper.Viper) fiber.Handler {
+	return func(c *fiber.Ctx) {
+		err := c.JSON(Health{Ready: true})
+		if err != nil {
+			c.Next(err)
+		}
 	}
 }
