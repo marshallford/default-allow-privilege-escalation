@@ -31,6 +31,11 @@ type appError struct {
 	Error string `json:"error"`
 }
 
+// Routes manages Fiber routes for mutate pkg
+func Routes(g *fiber.Group, config *viper.Viper) {
+	g.Post("/mutate", HandlerFunc(config))
+}
+
 func init() {
 	utilruntime.Must(corev1.AddToScheme(scheme))
 	utilruntime.Must(admissionv1.AddToScheme(scheme))

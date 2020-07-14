@@ -17,9 +17,8 @@ func New(config *viper.Viper) *fiber.App {
 	api := app.Group("/api", cors.New())
 	v1 := api.Group("/v1")
 
-	v1.Get("/healthz", health.HandlerFunc(config))
-
-	v1.Post("/mutate", mutate.HandlerFunc(config))
+	health.Routes(v1, config)
+	mutate.Routes(v1, config)
 
 	// API 404 handler
 	api.Use(func(c *fiber.Ctx) {

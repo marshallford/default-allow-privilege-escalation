@@ -2,9 +2,16 @@ package mutate
 
 import (
 	"bytes"
+	"defaultallowpe/pkg/config"
 	"encoding/json"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
+	"github.com/gofiber/fiber"
 	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -22,6 +29,18 @@ var (
 				Kind: "Pod",
 			},
 			Operation: "CREATE",
+		},
+	}
+	secret = corev1.Secret{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "v1",
+			Kind:       "Secret",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "some-secret",
+		},
+		Data: map[string][]byte{
+			"foo": []byte("bar"),
 		},
 	}
 	containerNoSecurityContext = corev1.Container{
@@ -73,18 +92,7 @@ func pod(ns string, initContainers []corev1.Container, containers []corev1.Conta
 }
 
 func TestBadAdmissionRequestObject(t *testing.T) {
-	secret, err := json.Marshal(corev1.Secret{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: "v1",
-			Kind:       "Secret",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "some-secret",
-		},
-		Data: map[string][]byte{
-			"foo": []byte("bar"),
-		},
-	})
+	secretBytes, err := json.Marshal(secret)
 
 	if err != nil {
 		t.Fatal("failed json encode Secret")
@@ -102,7 +110,7 @@ func TestBadAdmissionRequestObject(t *testing.T) {
 		},
 		{
 			name:     "secret",
-			input:    secret,
+			input:    secretBytes,
 			expected: "unexpected type *v1.Secret",
 		},
 	}
@@ -124,7 +132,7 @@ func TestBadAdmissionRequestObject(t *testing.T) {
 	}
 }
 
-func TestApiMutateNoPatches(t *testing.T) {
+func TestMutateNoPatches(t *testing.T) {
 	tt := []struct {
 		name     string
 		input    corev1.Pod
@@ -170,7 +178,7 @@ func TestApiMutateNoPatches(t *testing.T) {
 	}
 }
 
-func TestApiMutatePatches(t *testing.T) {
+func TestMutatePatches(t *testing.T) {
 	tt := []struct {
 		name     string
 		input    corev1.Pod
@@ -277,5 +285,134 @@ func TestApiMutatePatches(t *testing.T) {
 				t.Errorf("expected patch %s, got %s", expectedBytes, res.Patch)
 			}
 		})
+	}
+}
+
+func TestMutateFailures(t *testing.T) {
+	secretBytes, err := json.Marshal(secret)
+	if err != nil {
+		t.Fatal("failed json encode Secret")
+	}
+	admissionReview := admissionv1.AdmissionReview{}
+	admissionReview.TypeMeta = admissionReviewCreatePod.TypeMeta
+	arBytes, err := json.Marshal(admissionReview)
+	if err != nil {
+		t.Fatal("failed to json encode AdmissionReview")
+	}
+
+	tt := []struct {
+		name               string
+		input              io.Reader
+		setContentType     bool
+		expectedStatusCode int
+		expectedError      string
+	}{
+		{
+			name:               "content type",
+			input:              nil,
+			setContentType:     false,
+			expectedStatusCode: http.StatusUnsupportedMediaType,
+			expectedError:      "invalid content-type, expected application/json",
+		},
+		{
+			name:               "bad content",
+			input:              strings.NewReader("foobar"),
+			setContentType:     true,
+			expectedStatusCode: http.StatusBadRequest,
+			expectedError:      "could not decode AdmissionReview",
+		},
+		{
+			name:               "unexpected resource",
+			input:              bytes.NewReader(secretBytes),
+			setContentType:     true,
+			expectedStatusCode: http.StatusBadRequest,
+			expectedError:      "unexpected GroupVersionKind: /v1, Kind=Secret",
+		},
+		{
+			name:               "empty request",
+			input:              bytes.NewReader(arBytes),
+			setContentType:     true,
+			expectedStatusCode: http.StatusBadRequest,
+			expectedError:      "unexpected nil AdmissionRequest",
+		},
+	}
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			req := httptest.NewRequest("POST", "/mutate", tc.input)
+			if tc.setContentType {
+				req.Header.Set("Content-Type", "application/json")
+			}
+
+			config := config.New()
+			app := fiber.New()
+			Routes(app.Group(""), config)
+			res, _ := app.Test(req)
+
+			if res.StatusCode != tc.expectedStatusCode {
+				t.Errorf("expected status code %d, got %d", tc.expectedStatusCode, res.StatusCode)
+			}
+
+			bodyBytes, err := ioutil.ReadAll(res.Body)
+			if err != nil {
+				t.Fatal(err.Error())
+			}
+			var resBody map[string]interface{}
+			err = json.Unmarshal(bodyBytes, &resBody)
+			if err != nil {
+				t.Fatal("failed to json decode res body")
+			}
+			resError := resBody["error"]
+			if resError != tc.expectedError {
+				t.Errorf("expected error message %s, got %s", tc.expectedError, resError)
+			}
+		})
+	}
+}
+
+func TestMutateSuccess(t *testing.T) {
+	pod := pod("default", []corev1.Container{}, []corev1.Container{containerNoSecurityContext})
+	podBytes, err := json.Marshal(pod)
+	if err != nil {
+		t.Fatal("failed to json encode Pod")
+	}
+
+	admissionReview := admissionv1.AdmissionReview{}
+	admissionReview.TypeMeta = admissionReviewCreatePod.TypeMeta
+	admissionReview.Request = admissionReviewCreatePod.Request
+	admissionReview.Request.Kind = admissionReviewCreatePod.Request.Kind
+	admissionReview.Request.Object.Raw = podBytes
+	arBytes, err := json.Marshal(admissionReview)
+	if err != nil {
+		t.Fatal("failed to json encode AdmissionReview")
+	}
+
+	req := httptest.NewRequest("POST", "/mutate", bytes.NewReader(arBytes))
+	req.Header.Set("Content-Type", "application/json")
+
+	config := config.New()
+	app := fiber.New()
+	Routes(app.Group(""), config)
+	res, _ := app.Test(req)
+
+	if res.StatusCode != http.StatusOK {
+		t.Errorf("expected status code %d, got %d", http.StatusOK, res.StatusCode)
+	}
+
+	bodyBytes, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	var resBody map[string]interface{}
+	err = json.Unmarshal(bodyBytes, &resBody)
+	if err != nil {
+		t.Fatal("failed to json decode res body")
+	}
+	if !resBody["response"].(map[string]interface{})["allowed"].(bool) {
+		t.Error("expected allowed true, got allowed false")
+	}
+	expected := "JSONPatch"
+	patchType := resBody["response"].(map[string]interface{})["patchType"].(string)
+	if patchType != expected {
+		t.Errorf("expected patchType %s, got patchType %s", expected, patchType)
 	}
 }
