@@ -27,7 +27,7 @@ test:
 	$(GO) test ./... -race
 
 coverage:
-	$(GO) test -coverpkg=./... ./... -race
+	$(GO) test ./... -race -coverpkg=./... -covermode=atomic $(if $(CI), -coverprofile=coverage.out)
 
 build:
 	$(GO) build -o $(BIN) cmd/webhook/main.go
