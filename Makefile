@@ -1,6 +1,6 @@
 default: test
 
-VERSION := 0.01.0
+VERSION := 0.01.0-dev
 
 GITHUB_REPOSITORY ?= marshallford/default-allow-privilege-escalation
 IMAGE := $(GITHUB_REPOSITORY)
@@ -46,6 +46,6 @@ run:
 	$(GO) run cmd/webhook/main.go
 
 docker-run:
-	$(DOCKER) run -p 8443:8443 $(IMAGE):latest
+	$(DOCKER) run $(DOCKER_FLAGS) -p 8443:8443 $(IMAGE):latest
 
 .PHONY: lint test coverage build docker-build run docker-run

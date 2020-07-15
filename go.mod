@@ -10,10 +10,11 @@ require (
 	github.com/klauspost/compress v1.10.10 // indirect
 	github.com/mitchellh/mapstructure v1.3.2 // indirect
 	github.com/pelletier/go-toml v1.8.0 // indirect
-	github.com/spf13/afero v1.3.1 // indirect
+	github.com/spf13/afero v1.3.2 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.7.0
+	github.com/valyala/fasthttp v1.15.0 // indirect
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 	golang.org/x/text v0.3.3 // indirect
 	gopkg.in/ini.v1 v1.57.0 // indirect

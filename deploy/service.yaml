@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook
+  namespace: default-allow-privilege-escalation
+  labels:
+    app.kubernetes.io/name: default-allow-privilege-escalation-webhook
+    app.kubernetes.io/instance: default-allow-privilege-escalation
+spec:
+  type: ClusterIP
+  ports:
+  - port: 443
+    targetPort: https
+    protocol: TCP
+    name: https
+  selector:
+    app.kubernetes.io/name: default-allow-privilege-escalation
+    app.kubernetes.io/instance: default-allow-privilege-escalation

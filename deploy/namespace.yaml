@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: default-allow-privilege-escalation
+  labels:
+    app.kubernetes.io/name: default-allow-privilege-escalation-webhook
+    app.kubernetes.io/instance: default-allow-privilege-escalation

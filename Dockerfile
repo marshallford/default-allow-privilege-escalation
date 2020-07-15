@@ -1,4 +1,4 @@
-FROM golang:1.14.4-buster as build
+FROM golang:1.14.5-buster as build
 
 WORKDIR /go/src/app
 ADD . /go/src/app
@@ -8,7 +8,7 @@ RUN go get -d -v ./...
 WORKDIR /go/src/app/cmd/webhook
 RUN go build -o /go/bin/app
 
-FROM gcr.io/distroless/base-debian10
+FROM gcr.io/distroless/base-debian10:nonroot
 
 ARG MAINTAINER
 ARG CREATED

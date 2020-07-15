@@ -4,6 +4,9 @@ metadata:
   name: default-allow-privilege-escalation
   labels:
     app.kubernetes.io/name: default-allow-privilege-escalation-webhook
+    app.kubernetes.io/instance: default-allow-privilege-escalation
+  annotations:
+    cert-manager.io/inject-ca-from: "default-allow-privilege-escalation/webhook-server"
 webhooks:
 - name: default-allow-privilege-escalation.webhook.marshallford.me
   failurePolicy: Ignore
@@ -17,7 +20,6 @@ webhooks:
       name: webhook
       namespace: default-allow-privilege-escalation
       path: "/api/v1/mutate"
-    caBundle: ""
   rules:
   - operations: ["CREATE", "UPDATE"]
     apiGroups: [""]

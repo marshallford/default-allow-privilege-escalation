@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook
+  namespace: default-allow-privilege-escalation
+  labels:
+    app.kubernetes.io/name: default-allow-privilege-escalation-webhook
+    app.kubernetes.io/instance: default-allow-privilege-escalation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: default-allow-privilege-escalation
+      app.kubernetes.io/instance: default-allow-privilege-escalation
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: default-allow-privilege-escalation
+        app.kubernetes.io/instance: default-allow-privilege-escalation
+    spec:
+      serviceAccountName: webhook
+      securityContext: {}
+      containers:
+      - name: webhook
+        securityContext:
+          allowPrivilegeEscalation: false
+        image: marshallford/default-allow-privilege-escalation:0.01.0-dev
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: https
+          containerPort: 8443
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /api/v1/healthz
+            port: https
+        readinessProbe:
+          httpGet:
+            path: /api/v1/healthz
+            port: https
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        volumeMounts:
+        - mountPath: /run/secrets/tls
+          name: cert
+          readOnly: true
+        - mountPath: /run/configmaps/config
+          name: config
+          readOnly: true
+        env:
+        - name: CONFIGPATH
+          value: /run/configmaps/config
+      nodeSelector:
+        kubernetes.io/os: linux
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: webhook-server-cert
+      - name: config
+        configMap:
+          defaultMode: 420
+          name: webhook-config
