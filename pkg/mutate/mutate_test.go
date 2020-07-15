@@ -91,7 +91,7 @@ func pod(ns string, initContainers []corev1.Container, containers []corev1.Conta
 	}
 }
 
-func TestBadAdmissionRequestObject(t *testing.T) {
+func TestMutateBadAdmissionRequestObject(t *testing.T) {
 	secretBytes, err := json.Marshal(secret)
 
 	if err != nil {
@@ -288,7 +288,7 @@ func TestMutatePatches(t *testing.T) {
 	}
 }
 
-func TestMutateFailures(t *testing.T) {
+func TestMutateApiFailures(t *testing.T) {
 	secretBytes, err := json.Marshal(secret)
 	if err != nil {
 		t.Fatal("failed json encode Secret")
@@ -369,7 +369,7 @@ func TestMutateFailures(t *testing.T) {
 	}
 }
 
-func TestMutateSuccess(t *testing.T) {
+func TestMutateApiSuccess(t *testing.T) {
 	pod := pod("default", []corev1.Container{}, []corev1.Container{containerNoSecurityContext})
 	podBytes, err := json.Marshal(pod)
 	if err != nil {

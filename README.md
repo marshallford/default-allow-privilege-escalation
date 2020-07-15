@@ -9,11 +9,11 @@ Controls the nil behavior of the field `allowPrivilegeEscalation` in the [`Secur
 
 **TODO:**
 
-- [ ] find a better way to test Fiber handlers
-- [ ] tests for config and health packages
+- [x] find a better way to test Fiber handlers
+- [x] tests for config and health packages
 - [ ] webhook should self-manage CA bundle
 - [x] Github Actions with test and coverage badges
-- [ ] improve makefile
+- [x] improve makefile
 - [ ] release CI with tagging
 - [ ] publish container image
 - [ ] flesh out deploy yaml, add Kustomize support
