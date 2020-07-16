@@ -1,16 +1,10 @@
-on: [push, pull_request]
+on:
+- push
+- pull_request
 name: CI
 env:
   GO_VERSION: 1.14.5
 jobs:
-  build:
-    name: build
-    runs-on: ubuntu-20.04
-    steps:
-    - name: checkout
-      uses: actions/checkout@v2
-    - name: build container image
-      run: make docker-build
   test:
     name: test
     runs-on: ubuntu-20.04
@@ -21,6 +15,8 @@ jobs:
         go-version: ${{ env.GO_VERSION }}
     - name: checkout
       uses: actions/checkout@v2
+    - name: build
+      run: make build
     - name: test
       run: make test
   coverage:
@@ -58,3 +54,20 @@ jobs:
       uses: securego/gosec@master
       with:
         args: ./...
+  publish:
+    name: publish
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    needs:
+    - test
+    - lint
+    - security
+    runs-on: ubuntu-20.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: build container image
+      run: make docker-build
+    - name: dockerhub login
+      run: echo ${{ secrets.DOCKERHUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+    - name: push container image
+      run: make docker-push

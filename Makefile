@@ -40,12 +40,15 @@ docker-build:
 		--build-arg VERSION=$(VERSION) \
 		--build-arg TITLE=$(IMAGE) \
 		--build-arg REPOSITORY_URL=https://github.com/$(GITHUB_REPOSITORY) \
-		-t $(IMAGE):latest
+		-t $(IMAGE):$(VERSION)
+
+docker-push:
+	$(DOCKER) push $(IMAGE):$(VERSION)
 
 run:
 	$(GO) run cmd/webhook/main.go
 
 docker-run:
-	$(DOCKER) run $(DOCKER_FLAGS) -p 8443:8443 $(IMAGE):latest
+	$(DOCKER) run $(DOCKER_FLAGS) -p 8443:8443 $(IMAGE):$(VERSION)
 
-.PHONY: lint test coverage build docker-build run docker-run
+.PHONY: lint test coverage build docker-build docker-push run docker-run

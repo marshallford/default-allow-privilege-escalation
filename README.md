@@ -16,7 +16,7 @@ Controls the nil behavior of the field `allowPrivilegeEscalation` in the [`Secur
 - [x] improve makefile
 - [ ] release CI with tagging
 - [ ] publish container image
-- [ ] flesh out deploy yaml, add Kustomize support
+- [x] flesh out deploy yaml, add Kustomize support
 - [ ] provide install instructions
 - [ ] docs showing behavior
 
