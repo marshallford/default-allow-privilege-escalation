@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1alpha3
+kind: Certificate
+metadata:
+  name: webhook-server
+  namespace: default-allow-privilege-escalation
+  # labels: {} # managed by kustomize
+spec:
+  dnsNames:
+  - webhook.default-allow-privilege-escalation.svc.cluster.local
+  - webhook.default-allow-privilege-escalation.svc
+  issuerRef:
+    kind: Issuer
+    name: selfsigned
+  secretName: webhook-server-cert

@@ -3,20 +3,14 @@ kind: Deployment
 metadata:
   name: webhook
   namespace: default-allow-privilege-escalation
-  labels:
-    app.kubernetes.io/name: default-allow-privilege-escalation-webhook
-    app.kubernetes.io/instance: default-allow-privilege-escalation
+  # labels: {} # managed by kustomize
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app.kubernetes.io/name: default-allow-privilege-escalation
-      app.kubernetes.io/instance: default-allow-privilege-escalation
+    # matchLabels: {} # managed by kustomize
   template:
     metadata:
-      labels:
-        app.kubernetes.io/name: default-allow-privilege-escalation
-        app.kubernetes.io/instance: default-allow-privilege-escalation
+      # labels: {} # managed by kustomize
     spec:
       serviceAccountName: webhook
       securityContext: {}
@@ -24,7 +18,7 @@ spec:
       - name: webhook
         securityContext:
           allowPrivilegeEscalation: false
-        image: marshallford/default-allow-privilege-escalation:0.01.0-dev
+        image: docker.io/marshallford/default-allow-privilege-escalation:0.01.0-dev
         imagePullPolicy: IfNotPresent
         ports:
         - name: https
@@ -49,12 +43,12 @@ spec:
         - mountPath: /run/secrets/tls
           name: cert
           readOnly: true
-        - mountPath: /run/configmaps/config
-          name: config
+        - mountPath: /run/configmaps/webhook
+          name: webhook-config
           readOnly: true
         env:
         - name: CONFIGPATH
-          value: /run/configmaps/config
+          value: /run/configmaps/webhook
       nodeSelector:
         kubernetes.io/os: linux
       volumes:
@@ -62,7 +56,7 @@ spec:
         secret:
           defaultMode: 420
           secretName: webhook-server-cert
-      - name: config
+      - name: webhook-config
         configMap:
           defaultMode: 420
-          name: webhook-config
+          name: webhook

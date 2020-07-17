@@ -11,22 +11,52 @@ Controls the nil behavior of the field `allowPrivilegeEscalation` in the [`Secur
 
 - [x] find a better way to test Fiber handlers
 - [x] tests for config and health packages
-- [ ] webhook should self-manage CA bundle
+- [ ] ~~webhook should self-manage CA bundle~~
 - [x] Github Actions with test and coverage badges
 - [x] improve makefile
-- [ ] release CI with tagging
-- [ ] publish container image
+- [ ] release CI upon tagging
+- [x] publish container image
 - [x] flesh out deploy yaml, add Kustomize support
-- [ ] provide install instructions
+- [x] provide install instructions
 - [ ] docs showing behavior
 
 ## 🏁 Quickstart
 
-TODO
+### Prerequisites
+
+- Kubernetes version: >= v1.16
+- RBAC permissions for the install: [cluster-admin](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles) as a ClusterRole
+- Installed on cluster: [cert-manager](https://github.com/jetstack/cert-manager)
+
+### Install
+
+With [`kustomize`](https://github.com/kubernetes-sigs/kustomize):
+```
+# kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- github.com/marshallford/default-allow-privilege-escalation/deploy?ref=vX.Y.Z
+```
+
+Manually with `kubectl`:
+```
+git clone https://github.com/marshallford/default-allow-privilege-escalation.git
+cd default-allow-privilege-escalation
+# add labels where required for selectors, etc
+kubectl apply -f deploy
+```
 
 ## ⚙️ Configure
 
-TODO
+Example `config.yaml`:
+```yaml
+server:
+  tls:
+    enabled: true
+app:
+  default: false # default behavior for nil allowPrivilegeEscalation
+```
 
 ## 🤖 Hack
 

@@ -1,6 +1,8 @@
-apiVersion: v1
-kind: ServiceAccount
+apiVersion: cert-manager.io/v1alpha3
+kind: Issuer
 metadata:
-  name: webhook
+  name: selfsigned
   namespace: default-allow-privilege-escalation
   # labels: {} # managed by kustomize
+spec:
+  selfSigned: {}

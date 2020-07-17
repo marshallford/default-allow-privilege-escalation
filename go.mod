@@ -3,6 +3,7 @@ module defaultallowpe
 go 1.14
 
 require (
+	github.com/cloudflare/certinel v0.2.2
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gofiber/cors v0.2.1
 	github.com/gofiber/fiber v1.12.6
