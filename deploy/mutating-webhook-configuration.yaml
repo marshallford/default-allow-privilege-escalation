@@ -4,7 +4,7 @@ metadata:
   name: default-allow-privilege-escalation
   # labels: {} # managed by kustomize
   annotations:
-    cert-manager.io/inject-ca-from: "default-allow-privilege-escalation/webhook-server"
+    cert-manager.io/inject-ca-from: default-allow-privilege-escalation/webhook-server
 webhooks:
 - name: default-allow-privilege-escalation.webhook.marshallford.me
   failurePolicy: Ignore
@@ -17,7 +17,7 @@ webhooks:
     service:
       name: webhook
       namespace: default-allow-privilege-escalation
-      path: "/api/v1/mutate"
+      path: /api/v1/mutate
   rules:
   - operations: ["CREATE", "UPDATE"]
     apiGroups: [""]

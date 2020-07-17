@@ -4,6 +4,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
 
@@ -34,8 +35,12 @@ func New() *viper.Viper {
 	v.SetConfigName("config")
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			log.Fatalln("config file was found but another error was produced")
+			log.Fatal("config file was found but another error was produced")
 		}
 	}
+	v.WatchConfig()
+	v.OnConfigChange(func(e fsnotify.Event) {
+		log.Println("config file changed")
+	})
 	return v
 }

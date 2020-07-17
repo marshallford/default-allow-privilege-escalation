@@ -25,7 +25,7 @@ Controls the nil behavior of the field `allowPrivilegeEscalation` in the [`Secur
 ### Prerequisites
 
 - Kubernetes version: >= v1.16
-- RBAC permissions for the install: [cluster-admin](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles) as a ClusterRole
+- RBAC permissions for the install: ClusterRole [cluster-admin](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)
 - Installed on cluster: [cert-manager](https://github.com/jetstack/cert-manager)
 
 ### Install
