@@ -14,7 +14,7 @@ Controls the nil behavior of the field `allowPrivilegeEscalation` in the [`Secur
 - [ ] ~~webhook should self-manage CA bundle~~
 - [x] Github Actions with test and coverage badges
 - [x] improve makefile
-- [ ] release CI upon tagging
+- [x] release CI upon tagging
 - [x] publish container image
 - [x] flesh out deploy yaml, add Kustomize support
 - [x] provide install instructions
@@ -31,7 +31,7 @@ Controls the nil behavior of the field `allowPrivilegeEscalation` in the [`Secur
 ### Install
 
 With [`kustomize`](https://github.com/kubernetes-sigs/kustomize):
-```
+```yaml
 # kustomization.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -40,7 +40,7 @@ resources:
 ```
 
 Manually with `kubectl`:
-```
+```shell
 git clone https://github.com/marshallford/default-allow-privilege-escalation.git
 cd default-allow-privilege-escalation
 # add labels where required for selectors, etc
