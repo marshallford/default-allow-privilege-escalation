@@ -14,7 +14,7 @@ import (
 func TestHealthApi(t *testing.T) {
 	req := httptest.NewRequest("GET", "/healthz", nil)
 
-	config := config.New()
+	config, _ := config.New()
 	app := fiber.New()
 	Routes(app.Group(""), config)
 	res, _ := app.Test(req)

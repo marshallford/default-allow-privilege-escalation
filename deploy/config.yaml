@@ -1,0 +1,7 @@
+logging:
+  json: true
+server:
+  tls:
+    enabled: true
+app:
+  default: false # default behavior for nil allowPrivilegeEscalation

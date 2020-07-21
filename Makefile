@@ -20,8 +20,10 @@ GOARCH := `go env GOARCH`
 GOOS := `go env GOOS`
 BIN := default-allow-privilege-escalation-$(GOOS)_$(GOARCH)
 
+KUSTOMIZE := kustomize
+
 lint:
-	docker run --rm -v $(PWD):/app -w /app golangci/golangci-lint:v1.28 golangci-lint run -v
+	$(DOCKER) run --pull --rm -v $(PWD):/app -w /app golangci/golangci-lint:v1.28 golangci-lint run -v
 
 test:
 	$(GO) test ./... -race
@@ -42,6 +44,9 @@ docker-build:
 		--build-arg REPOSITORY_URL=https://github.com/$(GITHUB_REPOSITORY) \
 		-t $(IMAGE):$(VERSION)
 
+kubectl-install-build:
+	$(KUSTOMIZE) build deploy > kubectl-install.yaml
+
 docker-push:
 	$(DOCKER) push $(IMAGE):$(VERSION)
 
@@ -51,4 +56,4 @@ run:
 docker-run:
 	$(DOCKER) run $(DOCKER_FLAGS) -p 8443:8443 $(IMAGE):$(VERSION)
 
-.PHONY: lint test coverage build docker-build docker-push run docker-run
+.PHONY: lint test coverage build docker-build kubectl-install-build docker-push run docker-run

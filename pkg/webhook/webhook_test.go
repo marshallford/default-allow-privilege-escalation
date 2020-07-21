@@ -12,7 +12,7 @@ import (
 func TestAppNotFound(t *testing.T) {
 	req := httptest.NewRequest("GET", "/foobar", nil)
 
-	config := config.New()
+	config, _ := config.New()
 	app := New(config)
 	res, _ := app.Test(req)
 	if res.StatusCode != http.StatusNotFound {
@@ -23,7 +23,7 @@ func TestAppNotFound(t *testing.T) {
 func TestApiNotFound(t *testing.T) {
 	req := httptest.NewRequest("GET", "/api/vN/foobar", nil)
 
-	config := config.New()
+	config, _ := config.New()
 	app := New(config)
 	res, _ := app.Test(req)
 	if res.StatusCode != http.StatusNotFound {

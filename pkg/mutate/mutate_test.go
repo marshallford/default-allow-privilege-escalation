@@ -343,7 +343,7 @@ func TestMutateApiFailures(t *testing.T) {
 				req.Header.Set("Content-Type", "application/json")
 			}
 
-			config := config.New()
+			config, _ := config.New()
 			app := fiber.New()
 			Routes(app.Group(""), config)
 			res, _ := app.Test(req)
@@ -389,7 +389,7 @@ func TestMutateApiSuccess(t *testing.T) {
 	req := httptest.NewRequest("POST", "/mutate", bytes.NewReader(arBytes))
 	req.Header.Set("Content-Type", "application/json")
 
-	config := config.New()
+	config, _ := config.New()
 	app := fiber.New()
 	Routes(app.Group(""), config)
 	res, _ := app.Test(req)

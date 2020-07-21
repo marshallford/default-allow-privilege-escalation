@@ -2,7 +2,6 @@ apiVersion: cert-manager.io/v1alpha3
 kind: Issuer
 metadata:
   name: selfsigned
-  namespace: default-allow-privilege-escalation
   # labels: {} # managed by kustomize
 spec:
   selfSigned: {}

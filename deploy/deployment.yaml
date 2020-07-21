@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: webhook
-  namespace: default-allow-privilege-escalation
   # labels: {} # managed by kustomize
 spec:
   replicas: 1

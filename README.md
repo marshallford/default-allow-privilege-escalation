@@ -20,6 +20,7 @@ Controls the nil behavior of the field `allowPrivilegeEscalation` in the [`Secur
 - [x] flesh out deploy yaml, add Kustomize support
 - [x] provide install instructions
 - [ ] docs showing behavior
+- [ ] refactor make target `kubectl-install-build` to run in container
 
 ## 🏁 Quickstart
 
@@ -42,16 +43,15 @@ resources:
 
 Manually with `kubectl`:
 ```shell
-git clone https://github.com/marshallford/default-allow-privilege-escalation.git
-cd default-allow-privilege-escalation
-# add labels where required for selectors, etc
-kubectl apply -f deploy
+kubectl apply -f https://github.com/marshallford/default-allow-privilege-escalation/releases/latest/download/kubectl-install.yaml
 ```
 
 ## ⚙️ Configure
 
 Example `config.yaml`:
 ```yaml
+logging:
+  json: true
 server:
   tls:
     enabled: true

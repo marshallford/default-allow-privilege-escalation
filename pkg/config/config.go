@@ -1,17 +1,19 @@
 package config
 
 import (
-	"log"
 	"strings"
 
-	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
 
 // New creates a webhook config
-func New() *viper.Viper {
+func New() (*viper.Viper, error) {
 	c := map[string]interface{}{
 		"configPath": ".",
+		"logging": map[string]interface{}{
+			"level": "info",
+			"json":  false,
+		},
 		"server": map[string]interface{}{
 			"port": 8443,
 			"tls": map[string]interface{}{
@@ -35,12 +37,10 @@ func New() *viper.Viper {
 	v.SetConfigName("config")
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			log.Fatal("config file was found but another error was produced")
+			return nil, err
 		}
+		return v, nil
 	}
 	v.WatchConfig()
-	v.OnConfigChange(func(e fsnotify.Event) {
-		log.Println("config file changed")
-	})
-	return v
+	return v, nil
 }
