@@ -6,7 +6,7 @@
 [![Container Image](https://img.shields.io/docker/image-size/marshallford/default-allow-privilege-escalation?sort=semver)](https://hub.docker.com/r/marshallford/default-allow-privilege-escalation)
 [![License](https://img.shields.io/github/license/marshallford/default-allow-privilege-escalation)](/LICENSE)
 
-Controls the nil behavior of the field `allowPrivilegeEscalation` in the [`SecurityContext`](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#securitycontext-v1-core) object. Useful in cases where the PSP admission controller isn't enabled or available. With PSP, this behavior is managed the `*bool` type field named [`defaultAllowPrivilegeEscalation`](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/auth/no-new-privs.md#pod-security-policy-changes) in a Pod Security Policy resource.
+Controls the nil behavior of the field `allowPrivilegeEscalation` in the [`SecurityContext`](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#securitycontext-v1-core) object. Useful in cases where the PSP admission controller isn't enabled or available. With PSP this behavior is managed via the `*bool` type field [`defaultAllowPrivilegeEscalation`](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/auth/no-new-privs.md#pod-security-policy-changes) in a [`PodSecurityPolicy`](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#podsecuritypolicy-v1beta1-policy) resource.
 
 **TODO:**
 
@@ -21,6 +21,7 @@ Controls the nil behavior of the field `allowPrivilegeEscalation` in the [`Secur
 - [x] provide install instructions
 - [ ] docs showing behavior
 - [ ] refactor make target `kubectl-install-build` to run in container
+- [ ] investigate supporting versions `v1` and `v1beta1` of the `AdmissionReview` API
 
 ## 🏁 Quickstart
 
@@ -64,6 +65,7 @@ app:
 ### Test
 
 ```shell
+make lint
 make test
 make coverage
 ```
