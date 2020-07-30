@@ -23,7 +23,7 @@ BIN := default-allow-privilege-escalation-$(GOOS)_$(GOARCH)
 KUSTOMIZE := kustomize
 
 lint:
-	$(DOCKER) run --pull --rm -v $(PWD):/app -w /app golangci/golangci-lint:v1.29 golangci-lint run -v
+	$(DOCKER) run --rm -v $(PWD):/app -w /app golangci/golangci-lint:v1.29 golangci-lint run -v
 
 test:
 	$(GO) test ./... -race

@@ -55,7 +55,7 @@ func main() {
 			}).Warn("certinel was unable to reload the certificate")
 		})
 		sentinel.Watch()
-		tlsConfigs = append(tlsConfigs, &tls.Config{GetCertificate: sentinel.GetCertificate})
+		tlsConfigs = append(tlsConfigs, &tls.Config{GetCertificate: sentinel.GetCertificate, MinVersion: tls.VersionTLS12})
 	}
 	err = app.Listen(config.GetInt("server.port"), tlsConfigs...)
 	log.WithFields(log.Fields{

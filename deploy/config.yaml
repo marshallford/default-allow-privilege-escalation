@@ -1,5 +1,5 @@
 logging:
-  json: true
+  json: true # structured logs
 server:
   tls:
     enabled: true

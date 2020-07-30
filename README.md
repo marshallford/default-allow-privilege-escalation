@@ -52,7 +52,7 @@ kubectl apply -f https://github.com/marshallford/default-allow-privilege-escalat
 Example `config.yaml`:
 ```yaml
 logging:
-  json: true
+  json: true # structured logs
 server:
   tls:
     enabled: true
