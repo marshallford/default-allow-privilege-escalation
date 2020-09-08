@@ -32,8 +32,8 @@ type appError struct {
 }
 
 // Routes manages Fiber routes for mutate pkg
-func Routes(g *fiber.Group, config *viper.Viper) {
-	g.Post("/mutate", HandlerFunc(config))
+func Routes(r fiber.Router, config *viper.Viper) {
+	r.Post("/mutate", HandlerFunc(config))
 }
 
 func init() {

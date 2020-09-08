@@ -4,7 +4,7 @@ on:
     - 'v*'
 name: release
 env:
-  KUSTOMIZE_VERSION: 3.8.1
+  KUSTOMIZE_VERSION: 3.8.2
 jobs:
   release:
     name: release

@@ -11,8 +11,8 @@ type Health struct {
 }
 
 // Routes manages Fiber routes for health pkg
-func Routes(g *fiber.Group, config *viper.Viper) {
-	g.Get("/healthz", HandlerFunc(config))
+func Routes(r fiber.Router, config *viper.Viper) {
+	r.Get("/healthz", HandlerFunc(config))
 }
 
 // HandlerFunc returns a func that is a HTTP handler for health requests

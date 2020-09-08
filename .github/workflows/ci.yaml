@@ -7,7 +7,7 @@ on:
     - master
 name: CI
 env:
-  GO_VERSION: 1.14.5
+  GO_VERSION: 1.15.1
 jobs:
   test:
     name: test
@@ -47,7 +47,7 @@ jobs:
     - name: golangci-lint
       uses: golangci/golangci-lint-action@v1
       with:
-        version: v1.29
+        version: v1.31
   security:
     name: security
     runs-on: ubuntu-20.04
