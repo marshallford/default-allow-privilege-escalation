@@ -1,7 +1,7 @@
 package health
 
 import (
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/spf13/viper"
 )
 
@@ -17,10 +17,7 @@ func Routes(r fiber.Router, config *viper.Viper) {
 
 // HandlerFunc returns a func that is a HTTP handler for health requests
 func HandlerFunc(config *viper.Viper) fiber.Handler {
-	return func(c *fiber.Ctx) {
-		err := c.JSON(Health{Ready: true})
-		if err != nil {
-			c.Next(err)
-		}
+	return func(c *fiber.Ctx) error {
+		return c.JSON(Health{Ready: true})
 	}
 }

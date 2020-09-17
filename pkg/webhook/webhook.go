@@ -4,14 +4,14 @@ import (
 	"defaultallowpe/pkg/health"
 	"defaultallowpe/pkg/mutate"
 
-	"github.com/gofiber/cors"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/spf13/viper"
 )
 
 // New creates a webhook fiber app
 func New(config *viper.Viper) *fiber.App {
-	app := fiber.New(&fiber.Settings{
+	app := fiber.New(fiber.Config{
 		StrictRouting: true,
 	})
 	api := app.Group("/api", cors.New())
@@ -21,19 +21,16 @@ func New(config *viper.Viper) *fiber.App {
 	mutate.Routes(v1, config)
 
 	// API 404 handler
-	api.Use(func(c *fiber.Ctx) {
-		err := c.Status(fiber.StatusNotFound).JSON(map[string]interface{}{
+	api.Use(func(c *fiber.Ctx) error {
+		return c.Status(fiber.StatusNotFound).JSON(map[string]interface{}{
 			"code":   fiber.StatusNotFound,
 			"status": fiber.ErrNotFound.Message,
 		})
-		if err != nil {
-			c.Next(err)
-		}
 	})
 
 	// App 404 handler
-	app.Use(func(c *fiber.Ctx) {
-		c.Status(fiber.StatusNotFound).Send(fiber.ErrNotFound.Message)
+	app.Use(func(c *fiber.Ctx) error {
+		return c.Status(fiber.StatusNotFound).SendString(fiber.ErrNotFound.Message)
 	})
 
 	return app

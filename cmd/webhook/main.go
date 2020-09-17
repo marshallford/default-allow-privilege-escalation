@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"defaultallowpe/pkg/config"
 	"defaultallowpe/pkg/webhook"
+	"net"
 	"os"
 	"path/filepath"
 
@@ -37,8 +38,12 @@ func main() {
 	})
 
 	app := webhook.New(config)
-
-	var tlsConfigs []*tls.Config
+	ln, err := net.Listen("tcp", ":"+config.GetString("server.port"))
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Fatal("tcp listener failed")
+	}
 	if config.GetBool("server.tls.enabled") {
 		watcher, err := fswatcher.New(
 			filepath.Join(config.GetString("server.tls.dir"), config.GetString("server.tls.certFile")),
@@ -55,9 +60,9 @@ func main() {
 			}).Warn("certinel was unable to reload the certificate")
 		})
 		sentinel.Watch()
-		tlsConfigs = append(tlsConfigs, &tls.Config{GetCertificate: sentinel.GetCertificate, MinVersion: tls.VersionTLS12})
+		ln = tls.NewListener(ln, &tls.Config{GetCertificate: sentinel.GetCertificate, MinVersion: tls.VersionTLS12})
 	}
-	err = app.Listen(config.GetInt("server.port"), tlsConfigs...)
+	err = app.Listener(ln)
 	log.WithFields(log.Fields{
 		"err": err,
 	}).Fatal("webhook server failed")
