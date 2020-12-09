@@ -7,7 +7,7 @@ on:
     - master
 name: CI
 env:
-  GO_VERSION: 1.15.1
+  GO_VERSION: 1.15.6
 jobs:
   test:
     name: test
