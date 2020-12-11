@@ -12,7 +12,6 @@ func New() (*viper.Viper, error) {
 		"configPath": ".",
 		"logging": map[string]interface{}{
 			"level": "info",
-			"json":  false,
 		},
 		"server": map[string]interface{}{
 			"port": 8443,
