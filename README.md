@@ -22,7 +22,7 @@ Controls the nil behavior of the field `allowPrivilegeEscalation` in the [`Secur
 - [ ] docs showing behavior
 - [ ] refactor make target `kubectl-install-build` to run in container
 - [ ] investigate supporting versions `v1` and `v1beta1` of the `AdmissionReview` API
-- [ ] bump `Certificate` included in deployment to api version `v1`
+- [x] bump `Certificate` included in deployment to api version `v1`
 
 ## 🏁 Quickstart
 
