@@ -17,7 +17,7 @@ commonLabels:
 
 images:
 - name: docker.io/marshallford/default-allow-privilege-escalation
-  newTag: 1.0.3-dev
+  newTag: 1.0.3
 
 generatorOptions:
   disableNameSuffixHash: true
