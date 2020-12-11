@@ -20,7 +20,7 @@ jobs:
         wget -q https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv"$KUSTOMIZE_VERSION"/kustomize_v"$KUSTOMIZE_VERSION"_linux_amd64.tar.gz
         mkdir kustomize
         tar xzf kustomize_v"$KUSTOMIZE_VERSION"_linux_amd64.tar.gz -C kustomize
-        echo "::add-path::$PWD/kustomize"
+        echo "$PWD/kustomize" >> $GITHUB_PATH
     - name: build kubectl-install
       run: make kubectl-install-build
     - name: create release
